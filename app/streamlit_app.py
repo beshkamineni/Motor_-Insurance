@@ -187,7 +187,9 @@ def show_policy_analysis(data):
         st.pyplot(plot_policy_type_distribution(data['policies']))
     with col2:
         st.pyplot(plot_premium_by_policy_type(data['policies']))
-    st.pyplot(plot_monthly_premium_trend(data['policies']))
+    fig_trend = plot_monthly_premium_trend(data['policies'])
+    if fig_trend is not None:
+        st.pyplot(fig_trend)
 
 def show_claim_analysis(data):
     st.header("Claim Volume, Severity & Settlement Performance")
