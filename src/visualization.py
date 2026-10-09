@@ -1,44 +1,75 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
+import streamlit as st
 from typing import Dict, Optional
 
 sns.set_theme(style="whitegrid", palette="deep")
 
+
 def plot_policy_status(policies_df: pd.DataFrame) -> plt.Figure:
     fig, ax = plt.subplots(figsize=(8, 4.5))
     order = policies_df['policy_status'].value_counts().index
-    sns.countplot(data=policies_df, x='policy_status', order=order, ax=ax, palette='Blues_r')
+    sns.countplot(
+        data=policies_df,
+        x='policy_status',
+        order=order,
+        ax=ax,
+        palette='crest'
+    )
     ax.set_title("Portfolio Breakdown by Policy Status", fontsize=14, pad=12)
     ax.set_xlabel("Policy Status")
     ax.set_ylabel("Volume")
     for p in ax.patches:
-        ax.annotate(f"{int(p.get_height()):,}", (p.get_x() + p.get_width() / 2., p.get_height()),
-                    ha='center', va='bottom', fontsize=9, xytext=(0, 3), textcoords='offset points')
+        ax.annotate(
+            f"{int(p.get_height()):,}",
+            (p.get_x() + p.get_width() / 2., p.get_height()),
+            ha='center',
+            va='bottom',
+            fontsize=9,
+            xytext=(0, 3),
+            textcoords='offset points'
+        )
     plt.tight_layout()
     return fig
+
 
 def plot_policy_type_distribution(policies_df: pd.DataFrame) -> plt.Figure:
     fig, ax = plt.subplots(figsize=(8, 4.5))
     counts = policies_df['policy_type'].value_counts()
-    ax.pie(counts, labels=counts.index, autopct='%1.1f%%', startangle=140, colors=sns.color_palette('Set2'))
+    ax.pie(
+        counts,
+        labels=counts.index,
+        autopct='%1.1f%%',
+        startangle=140,
+        colors=sns.color_palette("Set2")
+    )
     ax.set_title("Distribution of Policy Types", fontsize=14, pad=12)
     plt.tight_layout()
     return fig
+
 
 def plot_premium_by_policy_type(policies_df: pd.DataFrame) -> plt.Figure:
     fig, ax = plt.subplots(figsize=(8, 4.5))
     agg = policies_df.groupby('policy_type')['premium_amount'].sum() / 1e6
     agg = agg.sort_values(ascending=False)
-    sns.barplot(x=agg.index, y=agg.values, ax=ax, palette='mako')
+    sns.barplot(x=agg.index, y=agg.values, ax=ax, palette='viridis')
     ax.set_title("Gross Written Premium by Policy Type (M INR)", fontsize=14, pad=12)
     ax.set_xlabel("Policy Type")
     ax.set_ylabel("Premium (Million INR)")
     for p in ax.patches:
-        ax.annotate(f"₹{p.get_height():.1f}M", (p.get_x() + p.get_width() / 2., p.get_height()),
-                    ha='center', va='bottom', fontsize=9, xytext=(0, 3), textcoords='offset points')
+        ax.annotate(
+            f"₹{p.get_height():.1f}M",
+            (p.get_x() + p.get_width() / 2., p.get_height()),
+            ha='center',
+            va='bottom',
+            fontsize=9,
+            xytext=(0, 3),
+            textcoords='offset points'
+        )
     plt.tight_layout()
     return fig
+
 
 def plot_monthly_claims(claims_df: pd.DataFrame) -> plt.Figure:
     fig, ax = plt.subplots(figsize=(10, 4.5))
@@ -54,6 +85,7 @@ def plot_monthly_claims(claims_df: pd.DataFrame) -> plt.Figure:
     plt.tight_layout()
     return fig
 
+
 def plot_claim_status(claims_df: pd.DataFrame) -> plt.Figure:
     fig, ax = plt.subplots(figsize=(8, 4.5))
     sns.countplot(data=claims_df, x='claim_status', ax=ax, palette='Spectral')
@@ -63,14 +95,22 @@ def plot_claim_status(claims_df: pd.DataFrame) -> plt.Figure:
     plt.tight_layout()
     return fig
 
+
 def plot_claim_type_distribution(claims_df: pd.DataFrame) -> plt.Figure:
     fig, ax = plt.subplots(figsize=(8, 4.5))
-    sns.countplot(data=claims_df, y='claim_type', ax=ax, order=claims_df['claim_type'].value_counts().index, palette='viridis')
+    sns.countplot(
+        data=claims_df,
+        y='claim_type',
+        ax=ax,
+        order=claims_df['claim_type'].value_counts().index,
+        palette='viridis'
+    )
     ax.set_title("Distribution of Incident/Claim Types", fontsize=14, pad=12)
     ax.set_xlabel("Number of Incidents")
     ax.set_ylabel("Claim Type")
     plt.tight_layout()
     return fig
+
 
 def plot_claim_amount_distribution(claims_df: pd.DataFrame) -> plt.Figure:
     fig, ax = plt.subplots(figsize=(8, 4.5))
@@ -80,6 +120,7 @@ def plot_claim_amount_distribution(claims_df: pd.DataFrame) -> plt.Figure:
     ax.set_ylabel("Frequency")
     plt.tight_layout()
     return fig
+
 
 def plot_claim_amount_by_vehicle_type(data: Dict[str, pd.DataFrame]) -> plt.Figure:
     fig, ax = plt.subplots(figsize=(8, 4.5))
@@ -93,6 +134,7 @@ def plot_claim_amount_by_vehicle_type(data: Dict[str, pd.DataFrame]) -> plt.Figu
     plt.tight_layout()
     return fig
 
+
 def plot_claims_by_region(data: Dict[str, pd.DataFrame]) -> plt.Figure:
     fig, ax = plt.subplots(figsize=(10, 4.5))
     m = data['claims'].merge(data['customers'], on='customer_id', how='left')
@@ -104,6 +146,7 @@ def plot_claims_by_region(data: Dict[str, pd.DataFrame]) -> plt.Figure:
     plt.xticks(rotation=45)
     plt.tight_layout()
     return fig
+
 
 def plot_claim_severity_by_region(data: Dict[str, pd.DataFrame]) -> plt.Figure:
     fig, ax = plt.subplots(figsize=(10, 4.5))
@@ -117,6 +160,7 @@ def plot_claim_severity_by_region(data: Dict[str, pd.DataFrame]) -> plt.Figure:
     plt.tight_layout()
     return fig
 
+
 def plot_average_settlement_time(claims_df: pd.DataFrame) -> plt.Figure:
     fig, ax = plt.subplots(figsize=(8, 4.5))
     valid = claims_df.dropna(subset=['claim_settlement_days'])
@@ -129,6 +173,7 @@ def plot_average_settlement_time(claims_df: pd.DataFrame) -> plt.Figure:
     plt.tight_layout()
     return fig
 
+
 def plot_claim_to_premium_by_policy_type(data: Dict[str, pd.DataFrame]) -> plt.Figure:
     fig, ax = plt.subplots(figsize=(8, 4.5))
     m = data['claims'].merge(data['policies'], on='policy_id', how='left')
@@ -140,26 +185,43 @@ def plot_claim_to_premium_by_policy_type(data: Dict[str, pd.DataFrame]) -> plt.F
     plt.tight_layout()
     return fig
 
+
 def plot_vehicle_age_vs_claim_amount(data: Dict[str, pd.DataFrame]) -> plt.Figure:
     fig, ax = plt.subplots(figsize=(8, 4.5))
     m = data['claims'].merge(data['policies'], on='policy_id', how='left')
     m = m.merge(data['vehicles'], on='vehicle_id', how='left')
-    sns.scatterplot(data=m.sample(min(1500, len(m))), x='vehicle_age', y='claim_amount', alpha=0.5, ax=ax, color='teal')
+    sns.scatterplot(
+        data=m.sample(min(1500, len(m))),
+        x='vehicle_age',
+        y='claim_amount',
+        alpha=0.5,
+        ax=ax,
+        color='teal'
+    )
     ax.set_title("Vehicle Age vs Claim Amount", fontsize=14, pad=12)
     ax.set_xlabel("Vehicle Age (Years)")
     ax.set_ylabel("Claim Amount (INR)")
     plt.tight_layout()
     return fig
 
+
 def plot_customer_age_vs_claim_amount(data: Dict[str, pd.DataFrame]) -> plt.Figure:
     fig, ax = plt.subplots(figsize=(8, 4.5))
     m = data['claims'].merge(data['customers'], on='customer_id', how='left')
-    sns.scatterplot(data=m.sample(min(1500, len(m))), x='customer_age', y='claim_amount', alpha=0.5, ax=ax, color='navy')
+    sns.scatterplot(
+        data=m.sample(min(1500, len(m))),
+        x='customer_age',
+        y='claim_amount',
+        alpha=0.5,
+        ax=ax,
+        color='navy'
+    )
     ax.set_title("Customer Age vs Claim Amount", fontsize=14, pad=12)
     ax.set_xlabel("Customer Age")
     ax.set_ylabel("Claim Amount (INR)")
     plt.tight_layout()
     return fig
+
 
 def plot_vehicle_type_claim_performance(data: Dict[str, pd.DataFrame]) -> plt.Figure:
     fig, ax = plt.subplots(figsize=(9, 4.5))
@@ -172,14 +234,22 @@ def plot_vehicle_type_claim_performance(data: Dict[str, pd.DataFrame]) -> plt.Fi
     plt.tight_layout()
     return fig
 
+
 def plot_damage_severity_distribution(claims_df: pd.DataFrame) -> plt.Figure:
     fig, ax = plt.subplots(figsize=(8, 4.5))
-    sns.countplot(data=claims_df, x='damage_severity', order=['Low', 'Medium', 'High'], ax=ax, palette='YlOrRd')
+    sns.countplot(
+        data=claims_df,
+        x='damage_severity',
+        order=['Low', 'Medium', 'High'],
+        ax=ax,
+        palette='YlOrRd'
+    )
     ax.set_title("Damage Severity Incident Count", fontsize=14, pad=12)
     ax.set_xlabel("Damage Severity")
     ax.set_ylabel("Count")
     plt.tight_layout()
     return fig
+
 
 def plot_payment_status(payments_df: pd.DataFrame) -> plt.Figure:
     fig, ax = plt.subplots(figsize=(8, 4.5))
@@ -190,16 +260,6 @@ def plot_payment_status(payments_df: pd.DataFrame) -> plt.Figure:
     plt.tight_layout()
     return fig
 
+
 def plot_monthly_premium_trend(policies_df: pd.DataFrame) -> plt.Figure:
     fig, ax = plt.subplots(figsize=(10, 4.5))
-    pol = policies_df.copy()
-    pol['policy_period'] = pol['policy_start_date'].dt.to_period('M')
-    ts = pol.groupby('policy_period')['premium_amount'].sum() / 1e6
-    ts.index = ts.index.astype(str)
-    sns.lineplot(x=ts.index, y=ts.values, marker='s', ax=ax, color='forestgreen', linewidth=2)
-    ax.set_title("Monthly Gross Written Premium Inflow (Million INR)", fontsize=14, pad=12)
-    ax.set_xlabel("Policy Start Month")
-    ax.set_ylabel("Premium Inflow (M INR)")
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-    return fig
